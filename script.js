@@ -3,6 +3,71 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function createStar (illo, size, vector, rotation, stro = 10) {
+    function calcStarPath (size) {
+        let path = [];
+        let starRadiusA = 3 *size; // ICI POUR MODIFIER LA TAILLE
+        let starRadiusB = 1.7 *size; // ICI POUR MODIFIER LA TAILLE
+        for ( let i=0; i<10; i++ ) {
+        let radius = i % 2 ? starRadiusA : starRadiusB;
+        let angle = TAU * i/10 + TAU/4;
+        let point = {
+            x: Math.cos( angle ) * radius,
+            y: Math.sin( angle ) * radius,
+        };
+        path.push( point );
+        }
+        return path;
+    }
+    let starColor ="#FFA62F"
+    return new Zdog.Shape({
+        path: calcStarPath(size),
+        addTo: illo,
+        translate: vector,
+        stroke: stro,
+        color: starColor,
+        fill: true,
+        rotate: rotation,
+    });
+}
+
+function createPlanet (size, vector, illo, stroke = 25 +size) {
+    let colorPlanets = ["#1D3B73", "#E74C3C", "#2ECC71", "#F39C12", "#8E44AD", "#3498DB", "#D35400", "#9B59B6", "#16A085", "#34495E"]
+    if (randomInt(1, 2) === 1) {
+        let planet = new Zdog.Group({ // PLANETE AVEC ANNEAU
+            addTo: illo,
+            
+            translate: vector,
+        })
+        
+        new Zdog.Shape({ 
+            addTo: planet,
+            stroke: 18+size,
+            color: colorPlanets[randomInt(0, colorPlanets.length-1)],
+        });
+    
+        new Zdog.Ellipse({ // ANNEAU DE LA PLANETE
+            addTo: planet,
+            diameter: stroke,
+            stroke: 4,
+            color: colorPlanets[randomInt(0, colorPlanets.length-1)],
+            rotate: {x: TAU/6},
+            
+        })
+    }
+    else {
+        let planetOne = new Zdog.Group({
+            addTo: illo,
+            translate: vector,
+        })
+        new Zdog.Shape({
+            addTo: planetOne,
+            stroke: 18+size,
+            color: '#7D0552',
+        });
+    }
+}
+
 
 function lightHouse () {
     const illo = new Zdog.Illustration({ // Window Shape ?
@@ -123,72 +188,7 @@ function lightHouse () {
         
     })
 
-    function createPlanet (size, vector) {
-        let colorPlanets = ["#1D3B73", "#E74C3C", "#2ECC71", "#F39C12", "#8E44AD", "#3498DB", "#D35400", "#9B59B6", "#16A085", "#34495E"]
-        if (randomInt(1, 2) === 1) {
-            let planet = new Zdog.Group({ // PLANETE AVEC ANNEAU
-                addTo: illo,
-                
-                translate: vector,
-            })
-            
-            new Zdog.Shape({ 
-                addTo: planet,
-                stroke: 18+size,
-                color: colorPlanets[randomInt(0, colorPlanets.length-1)],
-            });
-        
-            new Zdog.Ellipse({ // ANNEAU DE LA PLANETE
-                addTo: planet,
-                diameter: 25+size,
-                stroke: 4,
-                color: colorPlanets[randomInt(0, colorPlanets.length-1)],
-                rotate: {x: TAU/6},
-                
-            })
-        }
-        else {
-            let planetOne = new Zdog.Group({
-                addTo: illo,
-                translate: vector,
-            })
-            new Zdog.Shape({
-                addTo: planetOne,
-                stroke: 18+size,
-                color: '#7D0552',
-            });
-        }
-    }
-
     // ETOILE
-
-    function createStar (size, vector, rotation) {
-        function calcStarPath (size) {
-            let path = [];
-            let starRadiusA = 3 *size; // ICI POUR MODIFIER LA TAILLE
-            let starRadiusB = 1.7 *size; // ICI POUR MODIFIER LA TAILLE
-            for ( let i=0; i<10; i++ ) {
-            let radius = i % 2 ? starRadiusA : starRadiusB;
-            let angle = TAU * i/10 + TAU/4;
-            let point = {
-                x: Math.cos( angle ) * radius,
-                y: Math.sin( angle ) * radius,
-            };
-            path.push( point );
-            }
-            return path;
-        }
-        let starColor ="#FFA62F"
-        new Zdog.Shape({
-            path: calcStarPath(size),
-            addTo: illo,
-            translate: vector,
-            stroke: 10,
-            color: starColor,
-            fill: true,
-            rotate: rotation,
-        });
-    }
 
     const STAR_COORDONATES = []
     const PLAN_COORDONNATES = []
@@ -231,14 +231,14 @@ function lightHouse () {
     for (let i in STAR_COORDONATES)  {
         if (randomInt(1, 5) > 3) {
             let v = PLAN_COORDONNATES[i]
-            createPlanet(randomInt(1, 12), v[0])
+            createPlanet(randomInt(1, 12), v[0], illo)
         }
         else{
             let v = STAR_COORDONATES[i]
-            createStar(randomInt(1, 4), v[0],v[1])
+            createStar(illo, randomInt(1, 4), v[0],v[1])
         }    
     }
-    
+
     function animateModel() {
         illo.rotate.z += 0.03
         illo.updateRenderGraph()
@@ -247,6 +247,78 @@ function lightHouse () {
     animateModel()
 }
 
+function star () {
+    const illo = new Zdog.Illustration({ // Window Shape ?
+        element: '#stars', // La classe de notre canva
+        resize: 150,
+        dragRotate: true,
+    })
+
+    createStar(illo, 28, {}, {}, 20)
+
+    createStar(illo, 10, {x: -60, y: -120}, {})
+    createStar(illo, 13, {x: 30, y: -150}, {})
+
+    createStar(illo, 10, {x: 60, y: 120}, {})
+    createStar(illo, 13, {x: -30, y: 150}, {})
+
+    createStar(illo, 13, {x: -150}, {})
+    createStar(illo, 13, {x: 150}, {})
+
+    function animateModel() {
+        illo.rotate.z += 0.03
+        illo.rotate.y += 0.001
+
+        illo.updateRenderGraph()
+        requestAnimationFrame(animateModel)
+    }
+    animateModel()
+
+}
+
+function planet  (colors) {
+    const illo = new Zdog.Illustration({
+        element: '#planet-z',
+        resize: 150,
+        dragRotate: true,
+    })
+
+    function createPlanet2 (size, vector, diam, stroke, colors, illo) {
+        let planet = new Zdog.Group({ 
+            addTo: illo,
+            
+            translate: vector,
+        })
+        
+        new Zdog.Shape({ 
+            addTo: planet,
+            stroke: 18+size,
+            color: colors[0],
+        });
+        new Zdog.Ellipse({
+            addTo: planet,
+            diameter: diam,
+            stroke: stroke,
+            color: colors[1],
+            rotate: {x: TAU/6},
+            hidden: true
+        })
+        
+    }
+    createPlanet2(100, {x: 52, y: 52, z: 52}, 220, 15, colors, illo)
+
+    function animateModel() {
+        illo.rotate.x += 0.01
+        illo.rotate.y += 0.01
+        illo.rotate.z += 0.01
+
+
+        illo.updateRenderGraph()
+        requestAnimationFrame(animateModel)
+    }
+    animateModel()
+}
+
 lightHouse()
-
-
+star()
+planet(["#A70D2A", "#A70D2A"])
