@@ -76,9 +76,6 @@ button:hover {
 
     border-radius: 6px;
     padding: 8px;
-}
-
-#lighthouse {
     background-color: var(--color-2);
 }
 
